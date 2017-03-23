@@ -1,0 +1,72 @@
+<body>
+
+  <div class="container-fluid map-container">
+    <div class='sidebar'>Listing</div>
+    <div id='map' class='map'></div>
+  </div>
+
+  <style media="screen">
+    body {
+      background: #404040;
+      color: #f8f8f8;
+      font: 500 20px/26px 'Helvetica Neue', Helvetica, Arial, Sans-serif;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+    /* The page is split between map and sidebar - the sidebar gets 1/3, map
+gets 2/3 of the page. You can adjust this to your personal liking. */
+
+    .sidebar {
+      width: 33.3333%;
+    }
+
+    .map {
+      border-left: 1px solid #fff;
+      position: absolute;
+      left: 33.3333%;
+      width: 66.6666%;
+      top: 0;
+      bottom: 0;
+    }
+  </style>
+
+  <script type="text/javascript">
+    mapboxgl.accessToken = 'pk.eyJ1IjoiamVyZW15c21vcmdhbiIsImEiOiJjaWxjemtvYWEzejR4dHlseGlkaGZmb2t5In0.BOYaLR5RW0tbUPTFuz5Y0g';
+    // This adds the map to your page
+    var map = new mapboxgl.Map({
+      // container id specified in the HTML
+      container: 'map',
+      // style URL
+      style: 'mapbox://styles/jeremysmorgan/cixxc3h1i00232rqjeeagcb2l',
+      // initial position in [long, lat] format
+      center: [-77.034084, 38.909671],
+      // initial zoom
+      zoom: 14
+    });
+
+
+    map.on('load', function(e) {
+      // Add the data to your map as a layer
+      map.addLayer({
+        id: 'locations',
+        type: 'symbol',
+        // Add a GeoJSON source containing place coordinates and information.
+        source: {
+          type: 'geojson',
+          data: stores
+        },
+        layout: {
+          'icon-image': 'restaurant-15',
+          'icon-allow-overlap': true,
+        }
+      });
+    });
+
+    $(document).resize(function() {
+      console.log("redized");
+    })
+  </script>
+
+
+</body>
