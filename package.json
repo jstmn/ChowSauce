@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "emoji-name-map": "^1.2.3",
-    "express": "^4.15.2",
+    "express": "^3.21.2",
     "gzippo": "^0.2.0"
   }
 }
