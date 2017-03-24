@@ -18,7 +18,7 @@
         console.log("making post request to: " + post_url);
 
 
-        $.get("http://ipinfo.io", function(response) {
+        $.get("https://ipinfo.io", function(response) {
           $.getJSON('https://ipapi.co/' + response.ip + '/json', function(data) {
             $.ajax({
               type: 'POST',
