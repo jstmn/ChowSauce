@@ -9,63 +9,6 @@
 
 
       <script type="text/javascript">
-        pathArray = location.href.split('/');
-        protocol = pathArray[0];
-        host = pathArray[2];
-        url = protocol + '//' + host;
-        post_url = url + "/yelp"
-        console.log("Current url: " + url);
-        console.log("making post request to: " + post_url);
-
-
-        $.ajax({
-          type: 'POST',
-          data: {
-            "food_type": getParameterByName('type', window.location.href),
-            "geolocation": false,
-            "long": -1,
-            "lat": -1,
-            "radius": 1000,
-            "limit": 10
-          },
-          success: function(response) {
-            DOMUpdate(response);
-          },
-          error: function(xhr) {
-            console.log("Failure");
-            console.log(xhr)
-          },
-          url: post_url
-        });
-
-        function DOMUpdate(response) {
-          console.log(response);
-
-          var listings = document.getElementById('listings');
-          for (i = 0; i < response.length; i++) {
-
-            var name = response[i].name;
-            var listing = listings.appendChild(document.createElement('div'));
-            listing.className = 'item';
-            listing.id = 'listing-' + i;
-            var details = listing.appendChild(document.createElement('div'));
-            details.innerHTML = name;
-          }
-
-        }
-
-
-        function getParameterByName(name, url) {
-          if (!url) {
-            url = window.location.href;
-          }
-          name = name.replace(/[\[\]]/g, "\\$&");
-          var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-            results = regex.exec(url);
-          if (!results) return null;
-          if (!results[2]) return '';
-          return decodeURIComponent(results[2].replace(/\+/g, " "));
-        }
       </script>
 
 
@@ -73,7 +16,141 @@
     <div id='map' class='map'></div>
   </div>
 
+
+
+  <script type="text/javascript">
+    var current_listings = {};
+    var map_loaded = false;
+
+    pathArray = location.href.split('/');
+    protocol = pathArray[0];
+    host = pathArray[2];
+    url = protocol + '//' + host;
+    POST_baseurl = url + "/"
+
+    // -------------------------- // Yelp API Call // ------------------------- //
+    $.ajax({
+      type: 'POST',
+      data: {
+        "food_type": getParameterByName('type', window.location.href),
+        "geolocation": false,
+        "long": -1,
+        "lat": -1,
+        "radius": 1000,
+        "limit": 30
+      },
+      success: function(response) {
+        current_listings = response;
+        DOMCallback(response);
+        MapCallback(response);
+      },
+      error: function(xhr) {
+        console.log("Failure");
+        console.log(xhr)
+      },
+      url: POST_baseurl + "yelp"
+    });
+
+
+    mapboxgl.accessToken = 'pk.eyJ1IjoiamVyZW15c21vcmdhbiIsImEiOiJjaWxjemtvYWEzejR4dHlseGlkaGZmb2t5In0.BOYaLR5RW0tbUPTFuz5Y0g';
+    // This adds the map to your page
+    var map = new mapboxgl.Map({
+      // container id specified in the HTML
+      container: 'map',
+      // style URL
+      style: 'mapbox://styles/jeremysmorgan/cixxc3h1i00232rqjeeagcb2l',
+      // initial position in [long, lat] format
+      center: [-78.914056, 36.005626],
+      // initial zoom
+      zoom: 13
+    });
+
+
+    map.on('load', function(e) {
+      map_loaded = true;
+    });
+
+    /* Functions */
+    function MapCallback(data) {
+      if (map_loaded) {
+        var features = [];
+
+        for (var i = 0; i < data.length; i++) {
+          var current_listing = data[i];
+          features.push({
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [current_listing.coordinates.longitude, current_listing.coordinates.latitude]
+            },
+            "properties": {
+              "title": current_listing.name + "🍕"
+            }
+          });
+        }
+
+        map.addLayer({
+          "id": "restraunts",
+          "type": "symbol",
+          "source": {
+            "type": "geojson",
+            "data": {
+              "type": "FeatureCollection",
+              "features": features
+            }
+          },
+          "layout": {
+            "icon-image": "{icon}-15",
+            "text-field": "{title}",
+            "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+            "text-offset": [0, 0.6],
+            "text-anchor": "top"
+          }
+        });
+      } else {
+        map.on('load', function(e) {
+          MapCallback(data);
+        });
+      }
+    }
+
+    function DOMCallback(response) {
+      console.log(response);
+      var listings = document.getElementById('listings');
+      for (i = 0; i < response.length; i++) {
+        var name = response[i].name;
+        var listing = listings.appendChild(document.createElement('div'));
+        listing.className = 'item';
+        listing.id = 'listing-' + i;
+        var details = listing.appendChild(document.createElement('div'));
+        details.innerHTML = name;
+      }
+    }
+
+    function getParameterByName(name, url) {
+      if (!url) {
+        url = window.location.href;
+      }
+      name = name.replace(/[\[\]]/g, "\\$&");
+      var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+      if (!results) return null;
+      if (!results[2]) return '';
+      return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+  </script>
+
+
+
+
+
+
+
+
+
   <style media="screen">
+    /* ------------------------ // Map Directive CSS // ----------------------- */
+
     #listings .listings {
       margin-right: 3em;
     }
@@ -161,72 +238,7 @@
       top: 0;
       bottom: 0;
     }
+    /* ------------------------ // End of Map CSS // ----------------------- */
   </style>
-
-  <script type="text/javascript">
-    mapboxgl.accessToken = 'pk.eyJ1IjoiamVyZW15c21vcmdhbiIsImEiOiJjaWxjemtvYWEzejR4dHlseGlkaGZmb2t5In0.BOYaLR5RW0tbUPTFuz5Y0g';
-    // This adds the map to your page
-    var map = new mapboxgl.Map({
-      // container id specified in the HTML
-      container: 'map',
-      // style URL
-      style: 'mapbox://styles/jeremysmorgan/cixxc3h1i00232rqjeeagcb2l',
-      // initial position in [long, lat] format
-      center: [-78.914056, 36.005626],
-      // initial zoom
-      zoom: 13
-    });
-
-
-    var currentLayer = {
-      id: "restraunts",
-      type: ""
-    }
-
-
-    map.on('load', function(e) {
-      // Add the data to your map as a layer
-      map.addLayer({
-
-        "id": "points",
-        "type": "symbol",
-        "source": {
-          "type": "geojson",
-          "data": {
-            "type": "FeatureCollection",
-            "features": [{
-              "type": "Feature",
-              "geometry": {
-                "type": "Point",
-                "coordinates": [-78.914056, 36.005626]
-              },
-              "properties": {
-                "title": "Mapbox DC 🍕",
-                "icon": "monument"
-              }
-            }, {
-              "type": "Feature",
-              "geometry": {
-                "type": "Point",
-                "coordinates": [-122.414, 37.776]
-              },
-              "properties": {
-                "title": "Mapbox SF",
-                "icon": "harbor"
-              }
-            }]
-          }
-        },
-        "layout": {
-          "icon-image": "{icon}-15",
-          "text-field": "{title}",
-          "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
-          "text-offset": [0, 0.6],
-          "text-anchor": "top"
-        }
-      });
-    });
-  </script>
-
 
 </body>

@@ -33,6 +33,12 @@ app.post('/yelp', function(req, res) {
     req.connection.socket.remoteAddress;
 
   var geo = geoip.lookup(ip);
+  if (geo == null) {
+    console.log("Geo data is NULL");
+    geo = {
+      ll: [36.005626, -78.914056]
+    };
+  }
   console.log("ip: " + ip);
   console.log("geo: " + geo);
   var lat = geo.ll[0];
@@ -50,7 +56,7 @@ app.post('/yelp', function(req, res) {
     const client = yelp.client(response.jsonBody.access_token);
 
     client.search(searchRequest).then(response => {
-      console.log("Yelp API Call Successful");
+      console.log("Yelp API Call Successful. Found " + response.jsonBody.businesses.length + " restraunts");
       res.send(response.jsonBody.businesses);
     });
   }).catch(e => {
