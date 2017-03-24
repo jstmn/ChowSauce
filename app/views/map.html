@@ -84,7 +84,8 @@
               "coordinates": [current_listing.coordinates.longitude, current_listing.coordinates.latitude]
             },
             "properties": {
-              "title": current_listing.name + "🍕"
+              "title": current_listing.name + "🍕",
+              'icon-image': 'restaurant-15'
             }
           });
         }
@@ -168,6 +169,29 @@
       color: #333;
     }
 
+    * {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin: 0;
+      font-weight: 400;
+      line-height: 20px;
+      padding: 20px 2px;
+    }
+
+    a {
+      color: #404040;
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: #101010;
+    }
+
     .sidebar {
       position: absolute;
       width: 33.3333%;
@@ -176,6 +200,22 @@
       left: 0;
       overflow: hidden;
       border-right: 1px solid rgba(0, 0, 0, 0.25);
+    }
+
+    .map {
+      position: absolute;
+      left: 33.3333%;
+      width: 66.6666%;
+      top: 0;
+      bottom: 0;
+    }
+
+    .heading {
+      background: #fff;
+      border-bottom: 1px solid #eee;
+      height: 60px;
+      line-height: 60px;
+      padding: 0 10px;
     }
 
     .listings {
@@ -230,13 +270,16 @@
       border-radius: 0;
     }
 
-    .map {
-      border-left: 1px solid #fff;
-      position: absolute;
-      left: 33.3333%;
-      width: 66.6666%;
-      top: 0;
-      bottom: 0;
+    .clearfix {
+      display: block;
+    }
+
+    .clearfix::after {
+      content: '.';
+      display: block;
+      height: 0;
+      clear: both;
+      visibility: hidden;
     }
     /* ------------------------ // End of Map CSS // ----------------------- */
   </style>
