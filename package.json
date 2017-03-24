@@ -41,6 +41,7 @@
     "test": "karma start test/karma.conf.js"
   },
   "dependencies": {
+    "body-parser": "^1.17.1",
     "emoji-name-map": "^1.2.3",
     "express": "^3.21.2",
     "gzippo": "^0.2.0"

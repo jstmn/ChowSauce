@@ -1025,7 +1025,7 @@ hr {
   margin: 0 0 20px;
   border: 0;
   height: 1px;
-  background: #f8f8f8;
+  /*background: #f8f8f8;*/
   background: rgba(0, 0, 0, .05);
 }
 
