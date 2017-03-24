@@ -44,6 +44,7 @@
     "body-parser": "^1.17.1",
     "emoji-name-map": "^1.2.3",
     "express": "^3.21.2",
+    "geoip-lite": "^1.2.0",
     "gzippo": "^0.2.0",
     "yelp-fusion": "^1.0.3"
   }

@@ -18,29 +18,25 @@
         console.log("making post request to: " + post_url);
 
 
-        $.get("https://ipinfo.io", function(response) {
-          $.getJSON('https://ipapi.co/' + response.ip + '/json', function(data) {
-            $.ajax({
-              type: 'POST',
-              data: {
-                "ip": response.ip,
-                "food_type": getParameterByName('type', window.location.href),
-                "long": data.longitude,
-                "lat": data.latitude,
-                "radius": 1000,
-                "limit": 50
-              },
-              success: function(response) {
-                DOMUpdate(response);
-              },
-              error: function(xhr) {
-                console.log("Failure");
-                console.log(xhr)
-              },
-              url: post_url
-            });
-          });
-        }, "jsonp");
+        $.ajax({
+          type: 'POST',
+          data: {
+            "food_type": getParameterByName('type', window.location.href),
+            "geolocation": false,
+            "long": -1,
+            "lat": -1,
+            "radius": 1000,
+            "limit": 10
+          },
+          success: function(response) {
+            DOMUpdate(response);
+          },
+          error: function(xhr) {
+            console.log("Failure");
+            console.log(xhr)
+          },
+          url: post_url
+        });
 
         function DOMUpdate(response) {
           console.log(response);

@@ -1,6 +1,7 @@
 var gzippo = require('gzippo');
 var express = require('express');
 var app = express();
+var geoip = require('geoip-lite');
 
 const yelp = require('yelp-fusion');
 var bodyParser = require('body-parser');
@@ -18,18 +19,29 @@ app.post('/yelp', function(req, res) {
   console.log(req.body);
 
   /*
-  food_type: 'pizza',
-  lat: '-78.914056',
-  long: '36.005626',
-  radius: '1000'
-  limit: '12'
+  "food_type": getParameterByName('type', window.location.href),
+  "geolocation": false,
+  "long": -1,
+  "lat": -1,
+  "radius": 1000,
+  "limit": 50
   */
 
-  const searchRequest = {
+  var ip = req.headers['x-forwarded-for'] ||
+    req.connection.remoteAddress ||
+    req.socket.remoteAddress ||
+    req.connection.socket.remoteAddress;
 
+  var geo = geoip.lookup(ip);
+  console.log("ip: " + ip);
+  console.log("geo: " + geo);
+  var lat = geo.ll[0];
+  var long = geo.ll[1];
+
+  const searchRequest = {
     term: req.body.food_type,
-    latitude: req.body.lat,
-    longitude: req.body.long,
+    latitude: lat,
+    longitude: long,
     radius: req.body.radius,
     limit: req.body.limit
   };
