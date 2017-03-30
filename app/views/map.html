@@ -4,6 +4,7 @@
     <div class='sidebar' id='sidebar'>
 
       <h1 id="forceblack">Restraunts</h1>
+      <h6 id="geoapi"></h6>
 
       <div id='listings' class='listings'></div>
 
@@ -11,16 +12,19 @@
       <script type="text/javascript">
       </script>
 
-
     </div>
     <div id='map' class='map'></div>
   </div>
 
 
-
   <script type="text/javascript">
-    var current_listings = {};
     var map_loaded = false;
+    var yelp_loaded = false;
+    var lat = 0;
+    var long = 0;
+    var geoapi = $("#geoapi");
+    var yelp_data = {};
+
 
     pathArray = location.href.split('/');
     protocol = pathArray[0];
@@ -28,106 +32,143 @@
     url = protocol + '//' + host;
     POST_baseurl = url + "/"
 
-    // -------------------------- // Yelp API Call // ------------------------- //
-    $.ajax({
-      type: 'POST',
-      data: {
-        "food_type": getParameterByName('type', window.location.href),
-        "geolocation": false,
-        "long": -1,
-        "lat": -1,
-        "radius": 1000,
-        "limit": 30
-      },
-      success: function(response) {
-        current_listings = response;
-        DOMCallback(response);
-        MapCallback(response);
-      },
-      error: function(xhr) {
-        console.log("Failure");
-        console.log(xhr)
-      },
-      url: POST_baseurl + "yelp"
-    });
+    // -------------------------- // IP Call // ------------------------- //
+    if (navigator.geolocation) {
+      geoapi.innerHTML = "Geolocation Found";
+      navigator.geolocation.getCurrentPosition(setIP);
+    } else {
+      geoapi.innerHTML = "Geolocation is not supported by this browser.";
+      $.ajax({
+        type: 'POST',
+        success: function(response) {
+          console.log("lat long recieved from server");
+          lat = response.lat;
+          long = response.long;
+          APICalls();
+        },
+        error: function(xhr) {
+          console.log("Failure");
+          console.log(xhr)
+        },
+        url: POST_baseurl + "IP"
+      });
+    }
 
 
-    mapboxgl.accessToken = 'pk.eyJ1IjoiamVyZW15c21vcmdhbiIsImEiOiJjaWxjemtvYWEzejR4dHlseGlkaGZmb2t5In0.BOYaLR5RW0tbUPTFuz5Y0g';
-    // This adds the map to your page
-    var map = new mapboxgl.Map({
-      // container id specified in the HTML
-      container: 'map',
-      // style URL
-      style: 'mapbox://styles/jeremysmorgan/cixxc3h1i00232rqjeeagcb2l',
-      // initial position in [long, lat] format
-      center: [-78.914056, 36.005626],
-      // initial zoom
-      zoom: 13
-    });
+
+    function APICalls() {
+
+      // -------------------------- // Yelp API Call // ------------------------- //
+      var yelp_start_time = new Date().getTime();
+      console.log("lat: " + lat);
+      console.log("long: " + long);
+      $.ajax({
+        type: 'POST',
+        data: {
+          "food_type": getParameterByName('type', window.location.href),
+          "geolocation": false,
+          "long": -1,
+          "lat": -1,
+          "radius": 1000,
+          "limit": 30
+        },
+        success: function(response) {
+          var yelp_request_time = new Date().getTime() - yelp_start_time;
+          console.log("Yelp Request time: " + yelp_request_time);
+          YelpCallback(response);
+        },
+        error: function(xhr) {
+          console.log("Failure");
+          console.log(xhr)
+        },
+        url: POST_baseurl + "yelp"
+      });
 
 
-    map.on('load', function(e) {
-      map_loaded = true;
-    });
+      // -------------------------- // MapBox API Call // ------------------------- //
+      var map_start_time = new Date().getTime();
+      mapboxgl.accessToken = 'pk.eyJ1IjoiamVyZW15c21vcmdhbiIsImEiOiJjaWxjemtvYWEzejR4dHlseGlkaGZmb2t5In0.BOYaLR5RW0tbUPTFuz5Y0g';
+      var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/jeremysmorgan/cixxc3h1i00232rqjeeagcb2l',
+        center: [lat, long],
+        zoom: 13
+      });
+      map.on('load', function(e) {
+        var map_load_time = new Date().getTime() - map_start_time;
+        console.log("map_load_time: " + map_load_time);
 
-    /* Functions */
-    function MapCallback(data) {
+        MapCallback(e);
+      });
+
+    }
+
+    function YelpCallback(data) {
+      yelp_loaded = true;
+      yelp_data = data;
       if (map_loaded) {
-        var features = [];
-
-        for (var i = 0; i < data.length; i++) {
-          var current_listing = data[i];
-          features.push({
-            "type": "Feature",
-            "geometry": {
-              "type": "Point",
-              "coordinates": [current_listing.coordinates.longitude, current_listing.coordinates.latitude]
-            },
-            "properties": {
-              "title": current_listing.name + "🍕",
-              'icon-image': 'restaurant-15'
-            }
-          });
-        }
-
-        map.addLayer({
-          "id": "restraunts",
-          "type": "symbol",
-          "source": {
-            "type": "geojson",
-            "data": {
-              "type": "FeatureCollection",
-              "features": features
-            }
-          },
-          "layout": {
-            "icon-image": "{icon}-15",
-            "text-field": "{title}",
-            "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
-            "text-offset": [0, 0.6],
-            "text-anchor": "top"
-          }
-        });
-      } else {
-        map.on('load', function(e) {
-          MapCallback(data);
-        });
+        main();
       }
     }
 
-    function DOMCallback(response) {
-      console.log(response);
+    function MapCallback(e) {
+      map_loaded = true;
+      if (YelpCallback) {
+        main();
+      }
+    }
+
+    main() {
+      var data = yelp_data;
       var listings = document.getElementById('listings');
-      for (i = 0; i < response.length; i++) {
-        var name = response[i].name;
+      for (i = 0; i < data.length; i++) {
+        var name = data[i].name;
         var listing = listings.appendChild(document.createElement('div'));
         listing.className = 'item';
         listing.id = 'listing-' + i;
         var details = listing.appendChild(document.createElement('div'));
         details.innerHTML = name;
+        var image = listing.appendChild(document.createElement('div'));
       }
+
+      var features = [];
+
+      for (var i = 0; i < data.length; i++) {
+        var current_listing = data[i];
+        features.push({
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [current_listing.coordinates.longitude, current_listing.coordinates.latitude]
+          },
+          "properties": {
+            "title": current_listing.name + "🍕",
+            'icon-image': 'restaurant-15'
+          }
+        });
+      }
+
+      map.addLayer({
+        "id": "restraunts",
+        "type": "symbol",
+        "source": {
+          "type": "geojson",
+          "data": {
+            "type": "FeatureCollection",
+            "features": features
+          }
+        },
+        "layout": {
+          "icon-image": "{icon}-15",
+          "text-field": "{title}",
+          "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+          "text-offset": [0, 0.6],
+          "text-anchor": "top"
+        }
+      });
     }
 
+    // -------------------------- // Accessory Functions  // ------------------------- //
     function getParameterByName(name, url) {
       if (!url) {
         url = window.location.href;
@@ -138,6 +179,14 @@
       if (!results) return null;
       if (!results[2]) return '';
       return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+
+    function setIP(position) {
+      lat = position.coords.latitude;
+      long = position.coords.longitude;
+      console.log("In setIP");
+      console.log(lat);
+      console.log(long);
     }
   </script>
 

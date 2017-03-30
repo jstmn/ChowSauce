@@ -14,6 +14,37 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
   extended: true
 }));
 
+app.post('/IP', function(req, res) {
+  console.log("/IP Called");
+  console.log(req.body);
+
+  var ip = req.headers['x-forwarded-for'] ||
+    req.connection.remoteAddress ||
+    req.socket.remoteAddress ||
+    req.connection.socket.remoteAddress;
+
+  var geo = geoip.lookup(ip);
+  if (geo == null) {
+    console.log("Geo data is NULL");
+    geo = {
+      ll: [90, -90]
+    };
+  }
+  console.log("ip: " + ip);
+  console.log("geo: " + geo);
+  var lat = geo.ll[0];
+  var long = geo.ll[1];
+  response = {
+    lat: lat,
+    long: long
+  };
+  res.send(response);
+});
+
+
+
+
+
 app.post('/yelp', function(req, res) {
   console.log("/yelp Called");
   console.log(req.body);
@@ -36,7 +67,7 @@ app.post('/yelp', function(req, res) {
   if (geo == null) {
     console.log("Geo data is NULL");
     geo = {
-      ll: [36.005626, -78.914056]
+      ll: [90, -90]
     };
   }
   console.log("ip: " + ip);
