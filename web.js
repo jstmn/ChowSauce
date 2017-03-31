@@ -34,6 +34,8 @@ app.post('/IP', function(req, res) {
   console.log("geo: " + geo);
   var lat = geo.ll[0];
   var long = geo.ll[1];
+  console.log("lat: " + lat);
+  console.log("long: " + long);
   response = {
     lat: lat,
     long: long
@@ -58,22 +60,8 @@ app.post('/yelp', function(req, res) {
   "limit": 50
   */
 
-  var ip = req.headers['x-forwarded-for'] ||
-    req.connection.remoteAddress ||
-    req.socket.remoteAddress ||
-    req.connection.socket.remoteAddress;
-
-  var geo = geoip.lookup(ip);
-  if (geo == null) {
-    console.log("Geo data is NULL");
-    geo = {
-      ll: [90, -90]
-    };
-  }
-  console.log("ip: " + ip);
-  console.log("geo: " + geo);
-  var lat = geo.ll[0];
-  var long = geo.ll[1];
+  var lat = req.body.lat;
+  var long = req.body.long;
 
   const searchRequest = {
     term: req.body.food_type,
@@ -88,6 +76,9 @@ app.post('/yelp', function(req, res) {
 
     client.search(searchRequest).then(response => {
       console.log("Yelp API Call Successful. Found " + response.jsonBody.businesses.length + " restraunts");
+      if (response.jsonBody.businesses.length < 1) {
+        console.log("Zero results");
+      }
       res.send(response.jsonBody.businesses);
     });
   }).catch(e => {

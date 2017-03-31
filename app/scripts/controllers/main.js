@@ -9,8 +9,8 @@
  */
 angular.module('chowSauceApp').controller('MainCtrl', function MainCtrl($scope) {
 
-  $scope.header = "Welcome!"
-  $scope.subheader = "What kind of food would you like to eat?"
+  $scope.header = "Welcome!";
+  $scope.subheader = "What kind of food would you like to eat?";
 
   $scope.foods = [{
     name: 'pizza',
