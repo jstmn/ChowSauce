@@ -9,7 +9,7 @@
 
     <div id="loaded">
       <div class="sidebar" id="sidebar">
-        <h1 id="forceblack">Restraunts</h1>
+        <h1 id="forceblack">Locations</h1>
         <div id="listings" class="listings"></div>
       </div>
     </div>
@@ -155,18 +155,62 @@
       var data = yelp_data;
       var listings = document.getElementById("listings");
       for (var i = 0; i < data.length; i += 1) {
+
+        var parent_div = listings.appendChild(document.createElement('a'));
+        parent_div.href = "javascript:;";
+        parent_div.className = 'title';
+        parent_div.dataPosition = i;
+        parent_div.innerHTML = "";
+
         var name = data[i].name;
-        var listing = listings.appendChild(document.createElement("div"));
+        var listing = parent_div.appendChild(document.createElement("div"));
         listing.className = "item";
         listing.id = "listing-" + i;
         var details = listing.appendChild(document.createElement("div"));
-        details.innerHTML = name;
-        var image = listing.appendChild(document.createElement("div"));
+        details.innerHTML = "<h4>" + name + "</h4>";
+
+        var rating_div = listing.appendChild(document.createElement("div"));
+        rating_div.innerHTML += "Rating: ";
+        for (var j = 0; j < Math.round(data[i].rating); j++) {
+          rating_div.innerHTML += "⭐️";
+        }
+        rating_div.innerHTML = "<h6>" + rating_div.innerHTML + "</h6>";
+
+
+
+
+        parent_div.addEventListener('click', function(e) {
+          // Update the currentFeature to the store associated with the clicked link
+          var clickedListing = data[this.dataPosition];
+
+          // 1. Fly to the point
+          flyToStore(clickedListing, true);
+
+          // 2. Close all other popups and display popup for clicked store
+          createPopUp(clickedListing, true);
+
+          // 3. Highlight listing in sidebar (and remove highlight for all other listings)
+          var activeItem = document.getElementsByClassName('active');
+
+          if (activeItem[0]) {
+            activeItem[0].classList.remove('active');
+          }
+          this.parentNode.classList.add('active');
+        });
+
+
+
+
+
+
+
+
       }
 
       var features = [];
 
       for (var i = 0; i < data.length; i += 1) {
+        var address = data[i].location.display_address[0] + ", " + data[i].location.display_address[1];
         var current_listing = data[i];
         features.push({
           "type": "Feature",
@@ -176,7 +220,8 @@
           },
           "properties": {
             "title": current_listing.name,
-            "icon-image": "restaurant-15"
+            "icon-image": "restaurant-15",
+            "address": address
           }
         });
       }
@@ -205,28 +250,20 @@
       // --------------------------------- // Map Event Listeners // -------------------------------- //
       map.on('click', function(e) {
         console.log("map clicked");
-        // Query all the rendered points in the view
         var features = map.queryRenderedFeatures(e.point, {
           layers: ['locations']
         });
         if (features.length) {
           var clickedPoint = features[0];
-          // 1. Fly to the point
-          flyToStore(clickedPoint);
-          // 2. Close all other popups and display popup for clicked store
-          createPopUp(clickedPoint);
-          // 3. Highlight listing in sidebar (and remove highlight for all other listings)
+          flyToStore(clickedPoint, false);
+          createPopUp(clickedPoint, false);
           var activeItem = document.getElementsByClassName('active');
           if (activeItem[0]) {
             activeItem[0].classList.remove('active');
           }
-          // Find the index of the store.features that corresponds to the clickedPoint that fired the event listener
           var selectedFeature = clickedPoint.properties.address;
-
-
-          // Select the correct list item using the found index and add the active class
-          var listing = document.getElementById('listing-' + selectedFeatureIndex);
-          listing.classList.add('active');
+          //          var listing = document.getElementById('listing-' + selectedFeatureIndex);
+          //        listing.classList.add('active');
         }
       });
 
@@ -237,27 +274,49 @@
 
 
 
-    function flyToStore(currentFeature) {
-      map.flyTo({
-        center: currentFeature.geometry.coordinates,
-        zoom: 15
-      });
+    function flyToStore(currentFeature, listing_src) {
+      if (listing_src) {
+        map.flyTo({
+          center: [currentFeature.coordinates.longitude, currentFeature.coordinates.latitude],
+          zoom: 15.5
+        });
+      } else {
+        map.flyTo({
+          center: currentFeature.geometry.coordinates,
+          zoom: 15.5
+        });
+      }
+
     }
 
-    function createPopUp(currentFeature) {
+    function createPopUp(currentFeature, listing_src) {
 
-      console.log(currentFeature);
-      var popUps = document.getElementsByClassName('mapboxgl-popup');
-      // Check if there is already a popup on the map and if so, remove it
-      if (popUps[0]) popUps[0].remove();
+      if (listing_src) {
+        console.log("in create pop up");
+        console.log(currentFeature);
+        var popUps = document.getElementsByClassName('mapboxgl-popup');
+        if (popUps[0]) popUps[0].remove();
+        var popup = new mapboxgl.Popup({
+            closeOnClick: true
+          })
+          .setLngLat([currentFeature.coordinates.longitude, currentFeature.coordinates.latitude])
+          .setHTML('<h3>' + currentFeature.name + '</h3>' +
+            '<h4>' + currentFeature.location.display_address[0] + ", " + currentFeature.location.display_address[1] + '</h4>')
+          .addTo(map);
+      } else {
+        console.log(currentFeature);
+        var popUps = document.getElementsByClassName('mapboxgl-popup');
+        if (popUps[0]) popUps[0].remove();
 
-      var popup = new mapboxgl.Popup({
-          closeOnClick: true
-        })
-        .setLngLat(currentFeature.geometry.coordinates)
-        .setHTML('<h3>' + currentFeature.properties.title + '</h3>' +
-          '<h4>' + currentFeature.properties.address + '</h4>')
-        .addTo(map);
+        var popup = new mapboxgl.Popup({
+            closeOnClick: true
+          })
+          .setLngLat(currentFeature.geometry.coordinates)
+          .setHTML('<h3>' + currentFeature.properties.title + '</h3>' +
+            '<h4>' + currentFeature.properties.address + '</h4>')
+          .addTo(map);
+      }
+
     }
 
 
