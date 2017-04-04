@@ -296,9 +296,9 @@ angular.module('chowSauceApp').controller('MapCtrl', function MapCtrl($scope) {
   }
 
   function showDiv(name) {
-    var divs = document.getElementsByClassName("map-div");
-    for (var i = 0; i < divs.length; i++) {
-      $(divs[i]).hide();
+    var divs = ["loaded", "loading", "zero-results", "error"]
+    for (var i = 0; i < divs.length; i += 1) {
+      $("#" + divs[i]).hide();
     }
     $("#" + name).show();
   }
