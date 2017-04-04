@@ -22,11 +22,12 @@ angular.module('chowSauceApp').controller('MapCtrl', function MapCtrl($scope) {
   var url = protocol + "//" + host;
   var POST_baseurl = url + "/";
 
+  $(document).ready(function() {
+    showDiv("loading");
+  })
 
   // -------------------------- // IP Call // ------------------------- //
   if (navigator.geolocation) {
-    console.log("geolocation supported by browser found");
-    console.log(navigator.geolocation);
     navigator.geolocation.getCurrentPosition(function(position) {
       lat = position.coords.latitude;
       long = position.coords.longitude;
@@ -49,11 +50,9 @@ angular.module('chowSauceApp').controller('MapCtrl', function MapCtrl($scope) {
       success: function(response) {
         var error = response.error;
         if (error) {
-          console.error("IP Lookup failed");
           showDiv(error);
           $("#error-msg").text("IP Lookup failed");
         } else {
-          console.log("lat long recieved from server");
           lat = response.lat;
           long = response.long;
           APICalls();
