@@ -124,38 +124,6 @@ body {
   color: #fff;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Open Sans Bold', sans-serif;
-  font-weight: normal;
-  margin: 0;
-}
-
-em h1, h1 em, em h2, h2 em, em h3, h3 em, em h4, h4 em, em h5, h5 em, em h6, h6 em {
-  font-family: 'Open Sans Bold Italic', sans-serif;
-}
-
-h1 {
-  font-size: 30px;
-  line-height: 40px;
-}
-
-h2 {
-  font-size: 22px;
-  line-height: 30px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-}
-
-h3 {
-  font-size: 15px;
-  line-height: 20px;
-}
-
-h4, h5, h6 {
-  font-size: 12px;
-  line-height: 20px;
-}
-
 p {
   margin-bottom: 20px;
 }

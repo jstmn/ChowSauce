@@ -25,10 +25,11 @@ app.post('/IP', function(req, res) {
 
   var geo = geoip.lookup(ip);
   if (geo == null) {
-    console.log("Geo data is NULL");
-    geo = {
-      ll: [90, -90]
-    };
+    res.send({
+      lat: null,
+      long: null,
+      error: true
+    })
   }
   console.log("ip: " + ip);
   console.log("geo: " + geo);
@@ -38,7 +39,8 @@ app.post('/IP', function(req, res) {
   console.log("long: " + long);
   response = {
     lat: lat,
-    long: long
+    long: long,
+    error: false
   };
   res.send(response);
 });
