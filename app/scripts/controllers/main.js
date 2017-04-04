@@ -11,8 +11,8 @@ angular.module('chowSauceApp').controller('MainCtrl', function MainCtrl($scope) 
 
   var headers = ["Welcome to ChowSauce!", "ChowSauce!", "Chow... Sauce!!!", "CS Rocks!! :)", "Chow... what!!?!?!", "ChowSizzle in the hizzle!!!"]
   var subheaders = ["The best way to find food, ever!", "'A total game changer'", "Capital One rocks!", "What kind of food would you like to eat?"]
-  $scope.header = headers[Math.floor(Math.random() * headers.length)];
-  $scope.subheader = subheaders[Math.floor(Math.random() * subheaders.length)];
+  $scope.subheader = headers[Math.floor(Math.random() * headers.length)];
+  $scope.header = subheaders[Math.floor(Math.random() * subheaders.length)];
 
   $scope.foods = [{
     name: 'pizza',

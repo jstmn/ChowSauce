@@ -1,7 +1,24 @@
 <body ng-controller="MainCtrl">
 
   <div class="container-fluid">
-    <h1 class="text-center" ng-bind="header"></h1>
+
+    <h1 class="text-center" id="title">ChowSauce</h1>
+    <style media="screen">
+      #title {
+        font-family: 'Raleway', sans-serif;
+        font-size: 60px;
+        font-weight: 800;
+        line-height: 72px;
+        margin: 0 0 10px;
+        text-align: center;
+        transition: all .2s ease-in-out;
+        text-shadow: 2px 2px #00e7ff;
+      }
+
+      #title:hover {
+        transform: scale(1.05);
+      }
+    </style>
     <h3 class="text-center" ng-bind="subheader"></h3>
 
 
@@ -13,7 +30,7 @@
         </a>
       </div>
     </div>
-  </div>
+  </div>ggi
 
 
 

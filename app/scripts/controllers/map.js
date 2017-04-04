@@ -15,11 +15,6 @@ angular.module('chowSauceApp').controller('MapCtrl', function MapCtrl($scope) {
   var lat = null; // 36.004203; // null;
   var yelp_data = {};
   var map = null;
-  var localhost = true;
-
-  $(document).ready(function() {
-    showDiv("loading");
-  });
 
   var pathArray = location.href.split("/");
   var protocol = pathArray[0];
@@ -322,5 +317,8 @@ angular.module('chowSauceApp').controller('MapCtrl', function MapCtrl($scope) {
     if (!results[2]) return "";
     return decodeURIComponent(results[2].replace(/\+/g, " "));
   }
-  //
+
+
+
+
 });
