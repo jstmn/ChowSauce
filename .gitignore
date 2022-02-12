@@ -2,3 +2,6 @@
 /.tmp
 /.sass-cache
 /bower_components
+
+set_local_api_keys.sh
+set_heroku_api_keys.sh

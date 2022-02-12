@@ -10,18 +10,35 @@ ChowSauce is a AngularJS app running on a Node.js/Express server. The applicatio
 The site is hosted on Heroku at https://chowsauce.herokuapp.com
 
 Enjoy!
-<br>
-
-
-<small>
-This project is generated with [yo angular generator](https://github.com/yeoman/generator-angular)
-version 0.15.1.
 
 ## Build & development
 
+Setup - ubuntu
+```
+npm init
+npm update
+npm install
+
+# install grunt
+# sudo apt install node-grunt-cli < Don't do this
+sudo npm install --force -g grunt-cli
+sudo npm install -g bower
+bower install
+```
+
+Set api keys
+```
+heroku login
+source set_local_api_keys.sh
+chmod +x set_heroku_api_keys.sh
+./set_heroku_api_keys.sh
+```
+
 Run `grunt` for building and `grunt serve` for preview.
+
+This project is generated with [yo angular generator](https://github.com/yeoman/generator-angular)
+version 0.15.1.
 
 ## Testing
 
 Running `grunt test` will run the unit tests with karma.
-</small>

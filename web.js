@@ -6,8 +6,8 @@ var geoip = require('geoip-lite');
 const yelp = require('yelp-fusion');
 var bodyParser = require('body-parser');
 
-const clientId = '1nFlHMBcCkVny4keCU54Cg';
-const clientSecret = 'CY0Gy4a3pIuzmumdNKPlETcO2Krc8WRHLnhTOEpchoqSr7wu2Lq4iT9tdU8zgrJG';
+const CLIENT_ID = process.env.CLIENT_ID;
+const API_KEY = process.env.API_KEY;
 
 app.use(bodyParser.json()); // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
@@ -73,7 +73,7 @@ app.post('/yelp', function(req, res) {
     limit: req.body.limit
   };
 
-  yelp.accessToken(clientId, clientSecret).then(response => {
+  yelp.accessToken(CLIENT_ID, API_KEY).then(response => {
     const client = yelp.client(response.jsonBody.access_token);
 
     client.search(searchRequest).then(response => {
