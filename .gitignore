@@ -4,4 +4,6 @@
 /bower_components
 
 set_local_api_keys.sh
+set_api_key_local.sh
 set_heroku_api_keys.sh
+set_api_key_heroku.sh

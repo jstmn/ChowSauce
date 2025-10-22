@@ -26,6 +26,12 @@ sudo npm install -g bower
 bower install
 ```
 
+```
+npm install --force -g grunt-cli
+npm install -g bower
+bower install
+```
+
 Set api keys
 ```
 heroku login
